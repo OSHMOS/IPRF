@@ -51,9 +51,7 @@ os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'max_split_size_mb:128'
 
 # print(torch.cuda.device_count()) # 4
 
-device = "cuda:3" if torch.cuda.is_available() else "cpu"
-# device = "cuda:2" if torch.cuda.is_available() else "cpu"
-# device = "cuda:1" if torch.cuda.is_available() else "cpu"
+device = "cuda:1" if torch.cuda.is_available() else "cpu"
 
 parser = argparse.ArgumentParser()
 config_util.define_common_args(parser)
@@ -582,19 +580,11 @@ ic("Style image: ", args.style, style_img.shape)
 
 style = style_img.permute(2, 0, 1).unsqueeze(0).contiguous() # 1,3,h,w
 
-with torch.cuda.device(3):
-# with torch.cuda.device(2):
-# with torch.cuda.device(1):
+with torch.cuda.device(1):
     seed_everything(20200823)
 
-    # cuda:3
-    style = style.to('cuda:3')
-
-    # cuda:2
-    # style = style.to('cuda:2')
-
     # cuda:1
-    # style = style.to('cuda:1')
+    style = style.to('cuda:1')
 
     # h > w 면 1, 3, content long side, content short side
     if style.shape[2:][0] > style.shape[2:][-1]:
@@ -727,64 +717,19 @@ while True:
                     if not os.path.exists(result_epoch):
                         os.makedirs(result_epoch, exist_ok=True)
 
-                    # ['reflec_edge_64', 'reflec_edge_128', 'reflec_edge', 'illum_edge_64', 'illum_edge_128', 'illum_edge', 'unrefined_reflec', 'unrefined_shd', 'reflectance', 'shading', 'recon', 'cross_img']
-                    # 'reflectance' : 반사율 보정
-                    # 'shading' : 그림자 보정
-
-                    # print(list(albedo_pred))
-                    # print(list(albedo_gt))
-
-                    # print(rgb_pred.shape) # 1, 3, 756, 1008
-                    # print(rgb_gt.shape) # 1, 3, 756, 1008
-                    # h,w,3 # 기존 스타일 이미지를 콘텐츠 이미지의 긴 변에 맞추어 전처리한 것
-                    # print(style_img.shape)
-
-                    
-                    # print(style.shape) # b, c, h, w
-                    
-                    # print(style) # [0,1]
-                    # print(rgb_gt) # [0,1]
-                    # print(rgb_pred) # [0,1]
-
                     # 378x504 ours
                     content = F.interpolate(rgb_gt, scale_factor=0.5, mode='bilinear')
                     styled = F.interpolate(rgb_pred, scale_factor=0.5, mode='bilinear')
-                    # print(content.shape)
-                    # print(styled.shape)
-                    # style은 시작 전에 전처리됨. 알베도, 셰이딩 추출도 모두
-                    
-                    # for ablation
-                    # style image size test
-                    # content = F.interpolate(rgb_gt, size=style.shape[2:], mode='bilinear') # 원본 # 스타일 이미지에 맞춤
-                    # styled = F.interpolate(rgb_pred, size=style.shape[2:], mode='bilinear') # 스타일화 이미지 # 스타일 이미지에 맞춤
-
-                    # 256x256 test
-                    # style = F.interpolate(style, size=(256, 256), mode='bilinear')
-                    # content = F.interpolate(rgb_gt, size=(256, 256), mode='bilinear')
-                    # styled = F.interpolate(rgb_pred, size=(256, 256), mode='bilinear')
-
-                    # save content, styled, style
-                    # cv2.imwrite(f'{result_epoch}/content.png', postProcessing(content.squeeze()))
-                    # cv2.imwrite(f'{result_epoch}/styled.png', postProcessing(styled.squeeze()))
 
                     # print(torch.cuda.device_count()) # 4
 
-                    with torch.cuda.device(3):
-                    # with torch.cuda.device(2):
-                    # with torch.cuda.device(1):
+                    with torch.cuda.device(1):
                         seed_everything(20200823)
-                        
-                        # cuda:3
-                        content = content.to('cuda:3')
-                        styled = styled.to('cuda:3')
-
-                        # cuda:2
-                        # content = content.to('cuda:2')
-                        # styled = styled.to('cuda:2')
 
                         # cuda:1
-                        # content = content.to('cuda:1')
-                        # styled = styled.to('cuda:1')
+                        content = content.to('cuda:1')
+                        styled = styled.to('cuda:1')
+
                         # IID (Intrinsic Image Decomposition)
                         IID_content = net(content) # PIE-NET에 콘텐츠 이미지를 입력한 결과
                         IID_styled = net(styled) # PIE-NET에 스타일화된 이미지를 입력한 결과
@@ -795,22 +740,6 @@ while True:
                         # shading
                         shading_content = IID_content['shading'] # 콘텐츠 이미지의 shading                       
                         shading_styled = IID_styled['shading'] # 스타일화된 이미지의 shading
-
-                        # print(albedo_styled.shape)
-                        # print(shading_styled.shape)
-                        # print(shading_content.shape)
-
-                        #### Save IID Image
-                        # 과거: normalize를 안 하고 저장했던 것
-                        # 현재: normalize해서 저장
-
-                        # reflectance 결과 이미지 저장
-                        # cv2.imwrite(f'{result_epoch}/albedo_content.png', postProcessing(albedo_content.squeeze()))
-                        # cv2.imwrite(f'{result_epoch}/albedo_styled.png', postProcessing(albedo_styled.squeeze()))
-
-                        # shading 결과 이미지 저장
-                        # cv2.imwrite(f'{result_epoch}/shading_content.png', postProcessing(shading_content.squeeze()))
-                        # cv2.imwrite(f'{result_epoch}/shading_styled.png', postProcessing(shading_styled.squeeze()))
                         
                         #### End Save IID Image
                     
@@ -821,12 +750,6 @@ while True:
 
                     shading_content = shading_content.to('cuda:0')
                     shading_styled = shading_styled.to('cuda:0')
-
-                    # shading 결과로부터 vgg features를 뽑아내기 위해 1채널을 3번 쌓는 과정
-                    # shading_content_3ch = np.stack((shading_content.detach().cpu().numpy(),)*3, axis=-1)
-                    # shading_content_3ch = (torch.tensor(shading_content_3ch.squeeze(0)).to(device)).permute(0, 3, 1, 2)
-
-                    # shading_styled_3ch = shading_styled.repeat(1, 3, 1, 1)
 
                     albedo_style = albedo_style_img.permute(2, 0, 1).unsqueeze(0).contiguous() # 1,3,h,w
 

@@ -1,0 +1,9 @@
+data/
+.eggs/
+build/
+svox2.egg-info/
+svox2/csrc.cpython-39-x86_64-linux-gnu.so
+
+opt/ckpt_svox2/
+opt/ckpt_iprf/
+opt/iid_extractor/ckpt/

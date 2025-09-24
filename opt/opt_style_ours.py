@@ -56,9 +56,7 @@ os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'max_split_size_mb:128'
 
 # print(torch.cuda.device_count()) # 4
 
-device = "cuda:3" if torch.cuda.is_available() else "cpu"
-# device = "cuda:2" if torch.cuda.is_available() else "cpu"
-# device = "cuda:1" if torch.cuda.is_available() else "cpu"
+device = "cuda:1" if torch.cuda.is_available() else "cpu"
 
 parser = argparse.ArgumentParser()
 config_util.define_common_args(parser)
@@ -587,19 +585,11 @@ ic("Style image: ", args.style, style_img.shape)
 
 style = style_img.permute(2, 0, 1).unsqueeze(0).contiguous() # 1,3,h,w
 
-with torch.cuda.device(3):
-# with torch.cuda.device(2):
-# with torch.cuda.device(1):
+with torch.cuda.device(1):
     seed_everything(20200823)
 
-    # cuda:3
-    style = style.to('cuda:3')
-
-    # cuda:2
-    # style = style.to('cuda:2')
-
     # cuda:1
-    # style = style.to('cuda:1')
+    style = style.to('cuda:1')
 
     # h > w 면 1, 3, content long side, content short side
     if style.shape[2:][0] > style.shape[2:][-1]:
@@ -737,40 +727,11 @@ while True:
                     if not os.path.exists(result_epoch):
                         os.makedirs(result_epoch, exist_ok=True)
 
-                    # ['reflec_edge_64', 'reflec_edge_128', 'reflec_edge', 'illum_edge_64', 'illum_edge_128', 'illum_edge', 'unrefined_reflec', 'unrefined_shd', 'reflectance', 'shading', 'recon', 'cross_img']
-                    # 'reflectance'
-                    # 'shading'
-
-                    # print(list(albedo_pred))
-                    # print(list(albedo_gt))
-
-                    # print(rgb_pred.shape) # 1, 3, 756, 1008
-                    # print(rgb_gt.shape) # 1, 3, 756, 1008
-                    # h,w,3
-                    # print(style_img.shape)
-
-                    
-                    # print(style.shape) # b, c, h, w
-                    
-                    # print(style) # [0,1]
-                    # print(rgb_gt) # [0,1]
-                    # print(rgb_pred) # [0,1]
-
                     # 378x504 ours
                     content = F.interpolate(rgb_gt, scale_factor=0.5, mode='bilinear')
                     styled = F.interpolate(rgb_pred, scale_factor=0.5, mode='bilinear')
                     # print(content.shape)
                     # print(styled.shape)
-                    
-                    # for ablation
-                    # style image size test
-                    # content = F.interpolate(rgb_gt, size=style.shape[2:], mode='bilinear') # content 
-                    # styled = F.interpolate(rgb_pred, size=style.shape[2:], mode='bilinear') # stylized image
-
-                    # 256x256 test
-                    # style = F.interpolate(style, size=(256, 256), mode='bilinear')
-                    # content = F.interpolate(rgb_gt, size=(256, 256), mode='bilinear')
-                    # styled = F.interpolate(rgb_pred, size=(256, 256), mode='bilinear')
 
                     # save content, styled, style
                     cv2.imwrite(f'{result_epoch}/content.png', postProcessing(content.squeeze()))
@@ -778,22 +739,13 @@ while True:
 
                     # print(torch.cuda.device_count()) # 4
 
-                    with torch.cuda.device(3):
-                    # with torch.cuda.device(2):
-                    # with torch.cuda.device(1):
+                    with torch.cuda.device(1):
                         seed_everything(20200823)
-                        
-                        # cuda:3
-                        content = content.to('cuda:3')
-                        styled = styled.to('cuda:3')
-
-                        # cuda:2
-                        # content = content.to('cuda:2')
-                        # styled = styled.to('cuda:2')
 
                         # cuda:1
-                        # content = content.to('cuda:1')
-                        # styled = styled.to('cuda:1')
+                        content = content.to('cuda:1')
+                        styled = styled.to('cuda:1')
+
                         # IID (Intrinsic Image Decomposition)
                         IID_content = net(content) # content image to PIE-NET
                         IID_styled = net(styled) # stylized image to PIE-Net

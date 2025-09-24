@@ -51,9 +51,7 @@ os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'max_split_size_mb:128'
 
 # print(torch.cuda.device_count()) # 4
 
-device = "cuda:3" if torch.cuda.is_available() else "cpu"
-# device = "cuda:2" if torch.cuda.is_available() else "cpu"
-# device = "cuda:1" if torch.cuda.is_available() else "cpu"
+device = "cuda:1" if torch.cuda.is_available() else "cpu"
 
 parser = argparse.ArgumentParser()
 config_util.define_common_args(parser)
@@ -582,19 +580,11 @@ ic("Style image: ", args.style, style_img.shape)
 
 style = style_img.permute(2, 0, 1).unsqueeze(0).contiguous() # 1,3,h,w
 
-with torch.cuda.device(3):
-# with torch.cuda.device(2):
-# with torch.cuda.device(1):
+with torch.cuda.device(1):
     seed_everything(20200823)
 
-    # cuda:3
-    style = style.to('cuda:3')
-
-    # cuda:2
-    # style = style.to('cuda:2')
-
     # cuda:1
-    # style = style.to('cuda:1')
+    style = style.to('cuda:1')
 
     # h > w 면 1, 3, content long side, content short side
     if style.shape[2:][0] > style.shape[2:][-1]:
