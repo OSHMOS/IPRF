@@ -28,7 +28,7 @@ git clone https://github.com/OSHMOS/IPRF.git
 cd IPRF
 ```
 
-Install the bppc requirements using `conda` and `pip`:
+Install the iprf requirements using `conda` and `pip`:
 ```bash
 conda create -n iprf python=3.9 -y && conda activate iprf
 pip install -r requirements.txt
