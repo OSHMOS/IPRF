@@ -2,7 +2,7 @@
 ---
 [![Project Page](https://img.shields.io/badge/Project-Page-blue)](https://oshmos.github.io/IPRF)
 [![Accepted](https://img.shields.io/badge/Status-Accepted-green)](https://drive.google.com/file/d/10vp2SWByAJGr-Ccrw68c2hTepsMr5di9/view?usp=sharing)
-<!-- [![ACM](https://img.shields.io/badge/ACM-10.1145/12345-orange)](https://dl.acm.org/doi/10.1145/12345) -->
+[![ACM](https://img.shields.io/badge/ACM-10.1145/12345-orange)]([https://dl.acm.org/doi/10.1145/12345](https://dl.acm.org/doi/10.1145/3728486.3759217))
 [![Workshop](https://img.shields.io/badge/🏛️_Workshop-Homepage-blue)](https://mm2025-app3dv-workshop.github.io/)
 
 ![The framework of IPRF](./assets/IPRF_framework.png)
